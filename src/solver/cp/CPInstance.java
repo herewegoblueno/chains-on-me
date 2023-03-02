@@ -219,10 +219,7 @@ public class CPInstance {
 
       if (cp.solve()) {
         cp.printInformation();
-
-        // TODO: remove
-        IOHelper.generateVisualizerInput(numEmployees, numDays, startTimes, endTimes, cp);
-
+        //IOHelper.generateVisualizerInput(numEmployees, numDays, startTimes, endTimes, cp);
       } else {
         System.out.println("No Solution found!");
         System.out.println("Number of fails: " + cp.getInfo(IloCP.IntInfo.NumberOfFails));
@@ -236,7 +233,9 @@ public class CPInstance {
     String hours = "";
     for (int employee = 0; employee < numEmployees; employee++) {
       for (int day = 0; day < numDays; day++) {
-        hours += cp.getValue(startTimes[employee][day]) + " " + cp.getValue(endTimes[employee][day]) + " ";
+        hours += String.format("%s %s ",
+            cp.getIntValue(startTimes[employee][day]),
+            cp.getIntValue(endTimes[employee][day]));
       }
     }
     return hours.trim();
