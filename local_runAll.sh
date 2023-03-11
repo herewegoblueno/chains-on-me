@@ -4,7 +4,7 @@
 ############# CSCI 2951-O ##############
 ########################################
 
-#Designed to work on the department machines
+#Designed to work on the my local mac
 
 
 E_BADARGS=65
@@ -41,7 +41,7 @@ touch $logFile
 for f in $inputFolder*.*
 do
 	echo "Running $f"
-	timeout $timeLimit ./run.sh $f > output.tmp
+	timeout $timeLimit ./local_run.sh $f > output.tmp
 	returnValue="$?"
 	if [[ "$returnValue" = 0 ]]; then 						# Run is successful
 		cat output.tmp | tail -1 >> $logFile				# Record the last line as solution

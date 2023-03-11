@@ -3,6 +3,9 @@ package solver.cp;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import ilog.concert.IloIntVar;
 import ilog.cp.IloCP;
@@ -25,19 +28,22 @@ public class IOHelper {
    * @param endED        int[e][d] the hour employee e ends work on day d, -1 if
    *                     not working
    */
-  public static void generateVisualizerInput(int numEmployees, int numDays, IloIntVar[][] beginED, IloIntVar[][] endED, IloCP solver) {
+  public static void generateVisualizerInput(int numEmployees, int numDays, CPInstance solver, String filenameSuffix) {
     String solString = String.format("%d %d %n", numDays, numEmployees);
 
     for (int d = 0; d < numDays; d++) {
       for (int e = 0; e < numEmployees; e++) {
-        solString += String.format("%d %d %n", (int) solver.getValue(beginED[e][d]), (int) solver.getValue(endED[e][d]));
+        int[] employeeStartAndEnd = solver.getEmployeeStartAndEnd(e, d);
+        solString += String.format("%d %d %n", employeeStartAndEnd[0], employeeStartAndEnd[1]);
       }
     }
 
-    String fileName = Integer.toString(numDays) + "_" + Integer.toString(numEmployees) + "_sol.txt";
+    String fileName = "visualizer_input/" + Integer.toString(numDays) + "_" + Integer.toString(numEmployees) + "_"
+        + filenameSuffix + "_sol.txt";
 
     try {
       File resultsFile = new File(fileName);
+      Files.createDirectories(Paths.get(resultsFile.getParent()));
       if (resultsFile.createNewFile()) {
         System.out.println("File created: " + fileName);
       } else {
@@ -71,7 +77,8 @@ public class IOHelper {
    * @param endED        int[e][d] the hour employee e ends work on day d, -1 if
    *                     not working
    */
-  public static void prettyPrintGanttChart(int numEmployees, int numDays, IloIntVar[][] beginED, IloIntVar[][] endED, int numIntervalsInDay, IloCP solver) {
+  public static void prettyPrintGanttChart(int numEmployees, int numDays, IloIntVar[][] beginED, IloIntVar[][] endED,
+      int numIntervalsInDay, IloCP solver) {
     for (int e = 0; e < numEmployees; e++) {
       System.out.print("E" + (e + 1) + ": ");
       if (e < 9)
@@ -80,7 +87,8 @@ public class IOHelper {
         for (int i = 0; i < numIntervalsInDay; i++) {
           if (i % 8 == 0)
             System.out.print("|");
-          if (beginED[e][d] != endED[e][d] && i >= (int)solver.getValue(beginED[e][d]) && i < (int)solver.getValue(endED[e][d]))
+          if (beginED[e][d] != endED[e][d] && i >= (int) solver.getValue(beginED[e][d])
+              && i < (int) solver.getValue(endED[e][d]))
             System.out.print("+");
           else
             System.out.print(".");

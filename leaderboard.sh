@@ -1,1 +1,0 @@
-./runAll.sh input/ 300 results.log
